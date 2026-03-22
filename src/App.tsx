@@ -114,15 +114,7 @@ function RoomListItem({ room, onSelect }: RoomListItemProps) {
       <button
         type="button"
         onClick={() => onSelect(room)}
-        style={{
-          display: 'block',
-          width: '100%',
-          textAlign: 'left',
-          border: 'none',
-          background: 'transparent',
-          padding: 0,
-          cursor: 'pointer',
-        }}
+        className="room-card-button"
         aria-label={`View details for ${room.building} ${room.roomNumber}`}
       >
         <h3 className="room-title">
@@ -205,19 +197,13 @@ function App() {
             <p
               role="status"
               aria-live="polite"
-              className="room-meta"
-              style={{
-                marginBottom: '0.75rem',
-                padding: '0.5rem 0.75rem',
-                border: '1px solid var(--border)',
-                borderRadius: '0.5rem',
-              }}
+              className="room-meta booking-banner"
             >
               {bookingMessage}
             </p>
           )}
 
-          <div style={{ marginBottom: '1rem' }}>
+          <div className="availability-controls">
             <label htmlFor="selected-date">Date</label>
             <br />
             <input
@@ -227,7 +213,7 @@ function App() {
               onChange={(event) => setSelectedDate(event.target.value)}
             />
 
-            <div style={{ marginTop: '0.5rem' }}>
+            <div className="time-field">
               <label htmlFor="start-time">Start time</label>
               <br />
               <input
@@ -238,7 +224,7 @@ function App() {
               />
             </div>
 
-            <div style={{ marginTop: '0.5rem' }}>
+            <div className="time-field">
               <label htmlFor="end-time">End time</label>
               <br />
               <input
@@ -250,7 +236,7 @@ function App() {
             </div>
           </div>
 
-          <p className="room-meta" style={{ marginBottom: '0.75rem' }}>
+          <p className="room-meta room-count">
             Showing {filteredRooms.length} available rooms
           </p>
           <ul className="room-list">
@@ -263,7 +249,7 @@ function App() {
           )}
 
           {selectedRoom && (
-            <div style={{ marginTop: '1rem' }}>
+            <div className="details-panel">
               <RoomDetails
                 room={selectedRoom}
                 onClose={handleCloseDetails}
@@ -274,7 +260,7 @@ function App() {
         </section>
       </main>
 
-      <footer className="room-meta" style={{ marginTop: '1rem' }}>
+      <footer className="room-meta app-footer">
         Active filters: building {activeFilters.building ?? 'any'}, minimum capacity{' '}
         {activeFilters.minCapacity ?? 'any'}, features{' '}
         {activeFilters.features.length > 0

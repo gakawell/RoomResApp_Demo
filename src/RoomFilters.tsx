@@ -106,8 +106,8 @@ export default function RoomFilters({
 	};
 
 	return (
-		<div>
-			<div style={{ marginBottom: '0.75rem' }}>
+		<div className="filter-form">
+			<div className="filter-group">
 				<label htmlFor="building-filter">Building</label>
 				<br />
 				<select
@@ -124,7 +124,7 @@ export default function RoomFilters({
 				</select>
 			</div>
 
-			<div style={{ marginBottom: '0.75rem' }}>
+			<div className="filter-group">
 				<label htmlFor="capacity-filter">Minimum capacity</label>
 				<br />
 				<input
@@ -137,10 +137,10 @@ export default function RoomFilters({
 				/>
 			</div>
 
-			<fieldset style={{ border: 'none', padding: 0, margin: 0 }}>
+			<fieldset className="filter-fieldset">
 				<legend>Features</legend>
 				{FEATURE_OPTIONS.map((feature) => (
-					<label key={feature.value} style={{ display: 'block' }}>
+					<label key={feature.value} className="filter-checkbox">
 						<input
 							type="checkbox"
 							checked={activeFilters.features.includes(feature.value)}
