@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react';
 import './App.css';
 import { STUDY_ROOMS, type StudyRoom } from './rooms';
 import RoomFilters, { type ActiveFilters } from './RoomFilters';
+import RoomDetails from './RoomDetails';
 
 type RoomListItemProps = {
   room: StudyRoom;
+  onSelect: (room: StudyRoom) => void;
 };
 
 function matchesBuilding(room: StudyRoom, building: string | null): boolean {
@@ -97,7 +99,7 @@ function applyAvailabilityFilter(
   return rooms.filter((room) => isRoomAvailable(room, date, startTime, endTime));
 }
 
-function RoomListItem({ room }: RoomListItemProps) {
+function RoomListItem({ room, onSelect }: RoomListItemProps) {
   const keyFeatures = [
     ...(room.isQuiet ? ['quiet'] : []),
     ...(room.hasWhiteboard ? ['whiteboard'] : []),
@@ -109,11 +111,26 @@ function RoomListItem({ room }: RoomListItemProps) {
 
   return (
     <li className="room-item">
-      <h3 className="room-title">
-        {room.building} {room.roomNumber}
-      </h3>
-      <p className="room-meta">Capacity: {room.capacity} students</p>
-      <p className="room-meta">Key features: {keyFeatures.join(', ')}</p>
+      <button
+        type="button"
+        onClick={() => onSelect(room)}
+        style={{
+          display: 'block',
+          width: '100%',
+          textAlign: 'left',
+          border: 'none',
+          background: 'transparent',
+          padding: 0,
+          cursor: 'pointer',
+        }}
+        aria-label={`View details for ${room.building} ${room.roomNumber}`}
+      >
+        <h3 className="room-title">
+          {room.building} {room.roomNumber}
+        </h3>
+        <p className="room-meta">Capacity: {room.capacity} students</p>
+        <p className="room-meta">Key features: {keyFeatures.join(', ')}</p>
+      </button>
     </li>
   );
 }
@@ -128,6 +145,8 @@ function App() {
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [startTime, setStartTime] = useState<string>('');
   const [endTime, setEndTime] = useState<string>('');
+  const [selectedRoom, setSelectedRoom] = useState<StudyRoom | null>(null);
+  const [bookingMessage, setBookingMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const roomsAfterFilters = applyRoomFilters(STUDY_ROOMS, activeFilters);
@@ -148,6 +167,25 @@ function App() {
     setActiveFilters(nextActiveFilters);
   };
 
+  const handleRequestBooking = (room: StudyRoom) => {
+    const dateLabel = selectedDate || 'any date';
+    const timeLabel =
+      startTime && endTime ? `${startTime}-${endTime}` : 'any time range';
+
+    setBookingMessage(
+      `Booking request submitted for ${room.building} ${room.roomNumber} on ${dateLabel} at ${timeLabel}.`,
+    );
+    setSelectedRoom(null);
+
+    window.setTimeout(() => {
+      setBookingMessage(null);
+    }, 4000);
+  };
+
+  const handleCloseDetails = () => {
+    setSelectedRoom(null);
+  };
+
   return (
     <div className="app">
       <header className="app-header">
@@ -162,6 +200,22 @@ function App() {
 
         <section className="rooms-panel" aria-label="Study rooms">
           <h2>All Study Rooms</h2>
+
+          {bookingMessage && (
+            <p
+              role="status"
+              aria-live="polite"
+              className="room-meta"
+              style={{
+                marginBottom: '0.75rem',
+                padding: '0.5rem 0.75rem',
+                border: '1px solid var(--border)',
+                borderRadius: '0.5rem',
+              }}
+            >
+              {bookingMessage}
+            </p>
+          )}
 
           <div style={{ marginBottom: '1rem' }}>
             <label htmlFor="selected-date">Date</label>
@@ -201,11 +255,21 @@ function App() {
           </p>
           <ul className="room-list">
             {filteredRooms.map((room) => (
-              <RoomListItem key={room.id} room={room} />
+              <RoomListItem key={room.id} room={room} onSelect={setSelectedRoom} />
             ))}
           </ul>
           {filteredRooms.length === 0 && (
             <p className="room-meta">No rooms match the current filters.</p>
+          )}
+
+          {selectedRoom && (
+            <div style={{ marginTop: '1rem' }}>
+              <RoomDetails
+                room={selectedRoom}
+                onClose={handleCloseDetails}
+                onRequestBooking={handleRequestBooking}
+              />
+            </div>
           )}
         </section>
       </main>
